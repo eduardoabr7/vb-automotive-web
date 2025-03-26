@@ -1,0 +1,84 @@
+create schema private;
+
+create table private.cadastro_usuarios(
+	id SERIAL PRIMARY KEY,
+	email VARCHAR(100) not null,
+	passwd VARCHAR(100) NOT NULL,
+	data_hora_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	tel_contato VARCHAR(14) NOT NULL,
+	tipo_usuario CHAR(1) NOT NULL,
+
+	UNIQUE(email)
+);
+
+create table funcionario(
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(100),
+	cargo VARCHAR(100),
+	id_usuario INT NOT NULL,
+	
+	CONSTRAINT fk_id_usuario FOREIGN KEY (id_usuario) REFERENCES
+	private.cadastro_usuarios(id)
+);
+
+create table cliente(
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(100),
+	id_usuario INT NOT NULL,
+	
+	CONSTRAINT fk_id_cadastro FOREIGN KEY (id_usuario) REFERENCES
+	private.cadastro_usuarios(id)
+);
+
+create table veiculo(
+	id SERIAL PRIMARY KEY,
+	modelo VARCHAR(45),
+	km NUMERIC(8,0),
+	ano NUMERIC(4,0),
+	placa VARCHAR(10),
+	marca VARCHAR(50)
+);
+
+create table veiculo_cliente(
+	id_cliente INT NOT NULL,
+	id_veiculo INT NOT NULL,
+	
+	CONSTRAINT fk_id_cliente FOREIGN KEY (id_cliente) REFERENCES
+	cliente(id),
+
+	CONSTRAINT fk_id_veiculo FOREIGN KEY (id_veiculo) REFERENCES
+	veiculo(id)
+);
+
+create table atendimento(
+	id SERIAL PRIMARY KEY,
+	id_cliente INT NOT NULL,
+	id_funcionario INT NOT NULL,
+	data_hora_conclusao TIMESTAMP WITH TIME ZONE,
+	observacao VARCHAR(255),
+	data_hora_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+	CONSTRAINT fk_id_cliente FOREIGN KEY (id_cliente) REFERENCES
+	cliente(id),
+
+	CONSTRAINT fk_id_funcionario FOREIGN KEY
+	(id_funcionario) REFERENCES funcionario(id)
+);
+
+create table servico(
+	id SERIAL PRIMARY KEY,
+	descricao VARCHAR(255)
+);
+
+create table atendimento_servico(
+	id_atendimento INT NOT NULL,
+	id_servico INT NOT NULL,
+	status_servico VARCHAR(20) NOT NULL,
+	data_hora_conclusao_servico TIMESTAMP WITH TIME ZONE,
+
+	CONSTRAINT fk_id_atendimento FOREIGN KEY (id_atendimento)
+	REFERENCES atendimento(id),
+
+	CONSTRAINT fk_id_servico FOREIGN KEY (id_servico)
+	REFERENCES servico(id)
+);
